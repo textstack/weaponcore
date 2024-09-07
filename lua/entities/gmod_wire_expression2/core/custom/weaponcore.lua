@@ -1,6 +1,22 @@
 E2Lib.RegisterExtension("weaponcore", true)
 
-local sbox_E2_Dmg_Adv = CreateConVar( "sbox_E2_WeaponCore_allow_all_users", "0", FCVAR_ARCHIVE )
+local sbox_E2_Dmg_Adv = CreateConVar("sbox_E2_WeaponCore_allow_all_users", "0", FCVAR_ARCHIVE)
+
+local function giveSwep(ply, weaponClass)
+	if not ply:Alive() then return end
+
+	-- Make sure this is a SWEP
+	local swep = list.Get("Weapon")[weaponClass]
+	if not swep then return end
+
+	if not gamemode.Call("PlayerGiveSWEP", ply, weaponClass, swep) then return end
+
+	if not ply:HasWeapon(swep.ClassName) then
+		ply:Give(swep.ClassName)
+	end
+
+	ply:SelectWeapon(swep.ClassName)
+end
 
 local function isFriend(owner, player)
 	if owner == player then
@@ -20,7 +36,7 @@ local function isFriend(owner, player)
     end
 end
 
-local function ValidPly( ply )
+local function ValidPly(ply)
 	if not ply or not ply:IsValid() or not ply:IsPlayer() then
 		return false
 	end
@@ -57,7 +73,7 @@ e2function void entity:plyGive(string weaponClass)
 	if not ValidPly(this) then return self:throw("Invalid player", nil) end
 	if not hasAccess(self.player, this) then return self:throw("You do not have access", nil) end
 
-	this:Give(weaponClass)
+	giveSwep(this, weaponClass)
 end
 
 --- Give the player a weapon.
@@ -65,7 +81,7 @@ e2function void entity:plyGiveWeapon(string weaponClass)
 	if not ValidPly(this) then return self:throw("Invalid player", nil) end
 	if not hasAccess(self.player, this) then return self:throw("You do not have access", nil) end
 
-	this:Give(weaponClass)
+	giveSwep(this, weaponClass)
 end
 
 --- Gives ammo to a player.
