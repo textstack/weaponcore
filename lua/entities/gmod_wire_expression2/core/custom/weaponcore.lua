@@ -9,6 +9,11 @@ local function giveSwep(ply, weaponClass)
 	local swep = list.Get("Weapon")[weaponClass]
 	if not swep then return end
 
+	local isAdmin = ply:IsAdmin() or game.SinglePlayer()
+	if (not swep.Spawnable and not isAdmin) or (swep.AdminOnly and not isAdmin) then
+		return
+	end
+
 	if not gamemode.Call("PlayerGiveSWEP", ply, weaponClass, swep) then return end
 
 	if not ply:HasWeapon(swep.ClassName) then
